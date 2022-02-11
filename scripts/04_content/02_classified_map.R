@@ -33,8 +33,9 @@ after <- scored %>%
 bined_before <- before %>% 
   mutate(lon_bin = (round(lon / 0.5) + 0.25) * 0.5,
          lat_bin = (round(lat / 0.5) + 0.25) * 0.5) %>% 
-  filter(speed_fishing) %>% 
-  count(lon_bin, lat_bin)
+  count(year, lon_bin, lat_bin) %>% 
+  group_by(lon_bin, lat_bin) %>% 
+  summarize(n = mean(n))
 
 # Make figure
 total_hours_before <- ggplot() + 
@@ -47,18 +48,19 @@ total_hours_before <- ggplot() +
   geom_sf(data = new_revilla, fill = "transparent", color = "red", size = 0.3) +
   theme_void() +
   scale_fill_continuous(trans = "log10") +
-  labs(fill = "Total Hours")
+  labs(title = "Average activity",
+       fill = "Hours")
 
 # Export figure
 ggsave(plot = total_hours_before,
        filename = here("results", "img", "total_hours_before_map.png"),
        width = 6,
-       height = 4)
+       height = 3)
 
 ## ZOOMED IN MAP OF EFFORT FISHING/NOT FISHING _________________________________
 
 most <- "00000778"
-never <- "00041632"
+# never <- "00041632"
 
 most_before_zoom <- before %>% 
   filter(between(lon, revilla_bbox[1] - 1, revilla_bbox[3] + 1),
@@ -70,7 +72,8 @@ unclassified <- ggplot() +
              mapping = aes(x = lon, y = lat),
              size =  0.2, color = "steelblue") +
   geom_sf(data = new_revilla, fill = "transparent", color = "red", size = 0.3) +
-  theme_void()
+  theme_void() +
+  labs(title = "All pre-expansion activity by `Madeira`")
 
 classified <- ggplot() +
   geom_point(data = most_before_zoom,
@@ -79,7 +82,8 @@ classified <- ggplot() +
   scale_color_brewer(palette = "Set1", direction = -1) +
   geom_sf(data = new_revilla, fill = "transparent", color = "red", size = 0.3) +
   theme_void() +
-  theme(legend.position = "None")
+  theme(legend.position = "None") +
+  labs(title = "Scored pre-expansion activity by `Madeira`")
 
 ggsave(plot = unclassified,
        filename = here("results", "img", "most_unclassified_before.png"),

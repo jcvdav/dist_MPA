@@ -21,15 +21,21 @@ class: center, middle, inverse, title-slide
 
 
 
-# Outline
+# Before we begin
 
----
-# Background
+- We'll be looking at ocean space
 
+--
+
+- Motivated by past MPA and vessel displacement
+
+--
+
+- NOT about MPA displacement (I think)
 
 ---
 # Aggregate effort displacement
-## Expansion of Papahanaomokuakea
+## Expansion of Papahanaumokuakea
 
 .footnote[Lynham et al., 2020]
 
@@ -45,6 +51,51 @@ class: center, middle, inverse, title-slide
 
 
 ---
+# What's the question?
+
+--
+Not sure, but...
+
+--
+
+## Why do fishers fish where they fish?
+
+&lt;br&gt;
+
+--
+
+- Understanding _why_ processes arise is interesting
+
+&lt;br&gt;
+
+--
+
+- Understanding this will be relevant for MSP:
+
+  - Offshore wind farms
+  
+  - Offshore aquaculture
+  
+  - Ocean energy harvesting
+
+---
+# Thoughts
+
+I think it's an interaction between proximity (low cost of exploring) and ability / knowledge / proficiency
+
+&lt;br&gt;
+
+--
+
+&gt; ###For any given patch of ocean in the world, who fishes there will be determined by their access and ability to fish it
+
+--
+
+&lt;br&gt;
+
+I don't think the examples above have the data I need to explore this
+
+---
 # Revillagigedo (*Revilla*) - Old polygon
 
 &lt;img src="../../results/img/map_old_revilla.png" width="750" style="display: block; margin: auto;" /&gt;
@@ -55,71 +106,147 @@ class: center, middle, inverse, title-slide
 &lt;img src="../../results/img/map_new_revilla.png" width="750" style="display: block; margin: auto;" /&gt;
 
 ---
-# Tuna purse seining
+# I do have some data
 
-&lt;img src="../../results/img/total_hours_before_map.png" width="750" style="display: block; margin: auto;" /&gt;
+- Mexico requires vessels &gt; 10m to have a government-issued GPS
+
+--
+
+- A bunch of benefits come with it
+
+--
+
+- Tracking data are available (2011-2021)
+
+  - Hourly position for ~2,500 vessels
+
+--
+
+- Lots of info on vessel info
+
+  - size
+  
+  - crew
+  
+  - gear
+  
+  - ownership
 
 ---
-# Scoring
+# Tuna purse seining activity (55 vessels)
+
+&lt;img src="../../results/img/total_hours_before_map.png" width="1000" style="display: block; margin: auto;" /&gt;
+
+---
+# Today
+
+- What positions are fishing vs transiting?
+
+--
+
+- What is the historical use of Revilla?
+
+--
+
+- How does this vary across vessels?
+
+--
+
+- What might drive this variation?
+
+---
+# In-house ML
 
 &lt;img src="../../results/img/most_unclassified_before.png" width="750" style="display: block; margin: auto;" /&gt;
 
 
 ---
-# Scoring
+# In-house ML
 
 &lt;img src="../../results/img/most_classified_before.png" width="750" style="display: block; margin: auto;" /&gt;
 
 
 ---
-# Historical usage (aggregate)
+# Historical use (aggregate)
 
-On average, only 2.3% of fishing effort occurred within the MPA
+--
+
+On average, only 2.3% of fishing effort occurred within the expanded MPA
 
 &lt;img src="../../results/img/annual_pct_inside_outside.png" width="750" style="display: block; margin: auto;" /&gt;
 
 ---
-# Historical usage (individual)
+# Historical use (individual)
 
-&lt;img src="../../results/img/annual_pct_inside_by_vessel.png" width="750" style="display: block; margin: auto;" /&gt;
+--
 
----
-# Historical usage (individual)
-color by distance
+Some vessels are well above 2.3%
+
 &lt;img src="../../results/img/annual_pct_inside_by_vessel.png" width="750" style="display: block; margin: auto;" /&gt;
 
 ---
 # Is it proximity?
 
+--
+That's what it looks like
+
+&lt;img src="../../results/img/distance_and_usage.png" width="750" style="display: block; margin: auto;" /&gt;
+
+--
+
+Let's look into those
+
+
+---
+# Zoom in to equi-distant vessels
+
+&lt;img src="../../results/img/percent_effort_inside_closest_vessels.png" width="750" style="display: block; margin: auto;" /&gt;
+
+
+&lt;!-- --- --&gt;
+&lt;!-- # Why heterogeneity within the same vessels? --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Nothing special about Revilla --&gt;
+
+&lt;!-- If you were to draw a polygon anywhere in the ocean, I bet you would observe similar patterns --&gt;
 
 
 
 
 ---
-# Zoom in to equi-distant species
+# Thoughts
+
+
+`$$\Pi_t = pqE_tX_t - cE_t^\beta$$`
+
+And
+
+`$$X_{t+1} = X_t + rX_t (\frac{K - X_t}{K}) - H_t$$`
+
+
+--
+
+`$$\Pi_{it} = \sum_{j = 1}^J \left(pq_{ij}E_{ijt}X_j - cE_{ijt}^\beta\right)$$`
+
+--
+
+I think `\(q_{ij}\)` can be learned in time, thus:
+
+`$$q_{ijt} = k_j \theta_{it}$$`
+
+--
+
+With
+
+`$$\theta = f(theta_{ijt-1}, \text{visitation}, \text{distance})$$`
 
 ---
-# Why heterogeneity within the same vessels?
+# Thoughts
 
----
-# Nothing special abour Revilla
+Learning-by-doing setting
 
-If you were to draw a polygon anywhere in the ocean, I bet you would observe similat patterns
-
----
-# What's the question?
-
-## Understanding distributional impacts will be relevant for MSP
-
-## Understanding _why_ processes arise is interesting
-
-## Why do fishers fish where they fish?
-
----
-# Some thoughts
-
-Equations, perhaps
-
+Learning is costly
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
@@ -128,7 +255,7 @@ Equations, perhaps
 "highlightStyle": "github",
 "highlightLines": true,
 "ratio": "16:9",
-"countIncrementalSlides": true
+"countIncrementalSlides": false
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
