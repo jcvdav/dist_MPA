@@ -1,6 +1,6 @@
 ---
 title: "Random and ambiguous thoughts on the use of ocean space"
-subtitle: "Costello Lab Meeting"  
+subtitle: "~~Costello~~ Gaines Lab Meeting"  
 author: "J.C."
 date: 'Feb 11, 2022'
 output:
@@ -119,14 +119,14 @@ I don't think the examples above have the data I need to explore this
 # Revillagigedo (*Revilla*) - Old polygon
 
 ```{r}
-knitr::include_graphics("../../results/img/map_old_revilla.png") 
+knitr::include_graphics("img/map_old_revilla.png") 
 ```
 
 ---
 # Revillagigedo (*Revilla*) - Expansion (2017)
 
 ```{r}
-knitr::include_graphics("../../results/img/map_new_revilla.png") 
+knitr::include_graphics("img/map_new_revilla.png") 
 ```
 
 ---
@@ -160,7 +160,7 @@ knitr::include_graphics("../../results/img/map_new_revilla.png")
 # Tuna purse seining activity (55 vessels)
 
 ```{r, out.width=1000}
-knitr::include_graphics("../../results/img/total_hours_before_map.png")
+knitr::include_graphics("img/total_hours_before_map.png")
 ```
 
 ---
@@ -184,7 +184,7 @@ knitr::include_graphics("../../results/img/total_hours_before_map.png")
 # In-house ML
 
 ```{r}
-knitr::include_graphics("../../results/img/most_unclassified_before.png")
+knitr::include_graphics("img/most_unclassified_before.png")
 ```
 
 
@@ -192,7 +192,7 @@ knitr::include_graphics("../../results/img/most_unclassified_before.png")
 # In-house ML
 
 ```{r}
-knitr::include_graphics("../../results/img/most_classified_before.png") 
+knitr::include_graphics("img/most_classified_before.png") 
 ```
 
 
@@ -204,7 +204,7 @@ knitr::include_graphics("../../results/img/most_classified_before.png")
 On average, only 2.3% of fishing effort occurred within the expanded MPA
 
 ```{r}
-knitr::include_graphics("../../results/img/annual_pct_inside_outside.png") 
+knitr::include_graphics("img/annual_pct_inside_outside.png") 
 ```
 
 ---
@@ -215,7 +215,7 @@ knitr::include_graphics("../../results/img/annual_pct_inside_outside.png")
 Some vessels are well above 2.3%
 
 ```{r}
-knitr::include_graphics("../../results/img/annual_pct_inside_by_vessel.png") 
+knitr::include_graphics("img/annual_pct_inside_by_vessel.png") 
 ```
 
 ---
@@ -225,7 +225,7 @@ knitr::include_graphics("../../results/img/annual_pct_inside_by_vessel.png")
 That's what it looks like
 
 ```{r}
-knitr::include_graphics("../../results/img/distance_and_usage.png")
+knitr::include_graphics("img/distance_and_usage.png")
 ```
 
 --
@@ -237,7 +237,7 @@ Let's look into those
 # Zoom in to equi-distant vessels
 
 ```{r}
-knitr::include_graphics("../../results/img/percent_effort_inside_closest_vessels.png")
+knitr::include_graphics("img/percent_effort_inside_closest_vessels.png")
 ```
 
 
@@ -265,7 +265,7 @@ $$X_{t+1} = X_t + rX_t (\frac{K - X_t}{K}) - H_t$$
 
 --
 
-$$\Pi_{it} = \sum_{j = 1}^J \left(pq_{ij}E_{ijt}X_j - cE_{ijt}^\beta\right)$$
+$$\Pi_{it} = \sum_{j = 1}^J \left(pq_{ij}E_{ijt}X_{jt} - cE_{ijt}^\beta\right)$$
 
 --
 
@@ -277,7 +277,7 @@ $$q_{ijt} = k_j \theta_{it}$$
 
 With
 
-$$\theta = f(theta_{ijt-1}, \text{visitation}, \text{distance})$$
+$$\theta_{i + 1} = f(theta_{ijt}, \text{visitation}, \text{distance})$$
 
 ---
 # Thoughts

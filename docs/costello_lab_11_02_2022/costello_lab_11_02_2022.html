@@ -12,7 +12,7 @@
 class: center, middle, inverse, title-slide
 
 # Random and ambiguous thoughts on the use of ocean space
-## Costello Lab Meeting
+## <del>Costello</del> Gaines Lab Meeting
 ### J.C.
 ### Feb 11, 2022
 
@@ -98,12 +98,12 @@ I don't think the examples above have the data I need to explore this
 ---
 # Revillagigedo (*Revilla*) - Old polygon
 
-&lt;img src="../../results/img/map_old_revilla.png" width="750" style="display: block; margin: auto;" /&gt;
+&lt;img src="img/map_old_revilla.png" width="750" style="display: block; margin: auto;" /&gt;
 
 ---
 # Revillagigedo (*Revilla*) - Expansion (2017)
 
-&lt;img src="../../results/img/map_new_revilla.png" width="750" style="display: block; margin: auto;" /&gt;
+&lt;img src="img/map_new_revilla.png" width="750" style="display: block; margin: auto;" /&gt;
 
 ---
 # I do have some data
@@ -135,7 +135,7 @@ I don't think the examples above have the data I need to explore this
 ---
 # Tuna purse seining activity (55 vessels)
 
-&lt;img src="../../results/img/total_hours_before_map.png" width="1000" style="display: block; margin: auto;" /&gt;
+&lt;img src="img/total_hours_before_map.png" width="1000" style="display: block; margin: auto;" /&gt;
 
 ---
 # Today
@@ -157,13 +157,13 @@ I don't think the examples above have the data I need to explore this
 ---
 # In-house ML
 
-&lt;img src="../../results/img/most_unclassified_before.png" width="750" style="display: block; margin: auto;" /&gt;
+&lt;img src="img/most_unclassified_before.png" width="750" style="display: block; margin: auto;" /&gt;
 
 
 ---
 # In-house ML
 
-&lt;img src="../../results/img/most_classified_before.png" width="750" style="display: block; margin: auto;" /&gt;
+&lt;img src="img/most_classified_before.png" width="750" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -173,7 +173,7 @@ I don't think the examples above have the data I need to explore this
 
 On average, only 2.3% of fishing effort occurred within the expanded MPA
 
-&lt;img src="../../results/img/annual_pct_inside_outside.png" width="750" style="display: block; margin: auto;" /&gt;
+&lt;img src="img/annual_pct_inside_outside.png" width="750" style="display: block; margin: auto;" /&gt;
 
 ---
 # Historical use (individual)
@@ -182,7 +182,7 @@ On average, only 2.3% of fishing effort occurred within the expanded MPA
 
 Some vessels are well above 2.3%
 
-&lt;img src="../../results/img/annual_pct_inside_by_vessel.png" width="750" style="display: block; margin: auto;" /&gt;
+&lt;img src="img/annual_pct_inside_by_vessel.png" width="750" style="display: block; margin: auto;" /&gt;
 
 ---
 # Is it proximity?
@@ -190,7 +190,7 @@ Some vessels are well above 2.3%
 --
 That's what it looks like
 
-&lt;img src="../../results/img/distance_and_usage.png" width="750" style="display: block; margin: auto;" /&gt;
+&lt;img src="img/distance_and_usage.png" width="750" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -200,7 +200,7 @@ Let's look into those
 ---
 # Zoom in to equi-distant vessels
 
-&lt;img src="../../results/img/percent_effort_inside_closest_vessels.png" width="750" style="display: block; margin: auto;" /&gt;
+&lt;img src="img/percent_effort_inside_closest_vessels.png" width="750" style="display: block; margin: auto;" /&gt;
 
 
 &lt;!-- --- --&gt;
@@ -227,7 +227,7 @@ And
 
 --
 
-`$$\Pi_{it} = \sum_{j = 1}^J \left(pq_{ij}E_{ijt}X_j - cE_{ijt}^\beta\right)$$`
+`$$\Pi_{it} = \sum_{j = 1}^J \left(pq_{ij}E_{ijt}X_{jt} - cE_{ijt}^\beta\right)$$`
 
 --
 
@@ -239,7 +239,7 @@ I think `\(q_{ij}\)` can be learned in time, thus:
 
 With
 
-`$$\theta = f(theta_{ijt-1}, \text{visitation}, \text{distance})$$`
+`$$\theta_{i + 1} = f(theta_{ijt}, \text{visitation}, \text{distance})$$`
 
 ---
 # Thoughts

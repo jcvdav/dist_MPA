@@ -1,0 +1,22 @@
+---
+title: "Docs in here"
+author: "Juan Carlos Villaseñor-Derbez"
+output: html_document
+---
+
+# Contents
+
+```{r include=FALSE, warnings = FALSE, message = FALSE, echo = FALSE, output = "asis"}
+dirs <- list.dirs(here::here("docs"), recursive = F)
+base_dirs <- basename(dirs)
+
+make_links <- function(x){
+  cat(paste0("- [", x, "](", x, "/", x,".html)\n"))
+}
+
+for(i in base_dirs){
+  make_links(i)
+}
+
+```
+

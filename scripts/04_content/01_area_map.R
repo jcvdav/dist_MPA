@@ -32,11 +32,11 @@ map_new <- map_old +
 map_new
 
 ggsave(plot = map_old,
-       filename = here("results", "img", "map_old_revilla.png"),
+       filename = here("docs", "img", "map_old_revilla.png"),
        width = 6,
        height = 4)
 
 ggsave(plot = map_new,
-       filename = here("results", "img", "map_new_revilla.png"),
+       filename = here("docs", "img", "map_new_revilla.png"),
        width = 6,
        height = 4)

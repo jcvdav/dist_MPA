@@ -53,7 +53,7 @@ total_hours_before <- ggplot() +
 
 # Export figure
 ggsave(plot = total_hours_before,
-       filename = here("results", "img", "total_hours_before_map.png"),
+       filename = here("docs", "img", "total_hours_before_map.png"),
        width = 6,
        height = 3)
 
@@ -86,12 +86,12 @@ classified <- ggplot() +
   labs(title = "Scored pre-expansion activity by `Madeira`")
 
 ggsave(plot = unclassified,
-       filename = here("results", "img", "most_unclassified_before.png"),
+       filename = here("docs", "img", "most_unclassified_before.png"),
        width = 6,
        height = 4)
 
 ggsave(plot = classified,
-       filename = here("results", "img", "most_classified_before.png"),
+       filename = here("docs", "img", "most_classified_before.png"),
        width = 6,
        height = 4)
 
