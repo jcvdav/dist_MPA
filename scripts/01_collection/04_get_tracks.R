@@ -44,8 +44,7 @@ vessel_info <- tbl(mex_fisheries, "vessel_info") %>%
 
 
 tracks <- tbl(mex_fisheries, "mex_vms") %>% 
-  filter(speed > 0) %>% 
-  select(name, vessel_rnpa, year, month, datetime, lon, lat, speed) %>%
+  select(name, vessel_rnpa, year, month, datetime, lon, lat, speed, course) %>%
   inner_join(vessel_info, by = "vessel_rnpa")
 
 local_tracks <- tracks %>% 
