@@ -1,10 +1,8 @@
 ---
-title: "Presentation Ninja"
-subtitle: "&#x2694;&#xFE0F; xaringan +<br/>&#x1F60E; xaringanthemer"  
-author: 
-  - "Yihui Xie"
-  - "Garrick Aden-Buie"
-date: '`r Sys.Date()`'
+title: "Random and ambiguous thoughts on the use of ocean space"
+subtitle: "Costello Lab Meeting"  
+author: "J.C."
+date: 'Feb 11, 2022'
 output:
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -22,7 +20,9 @@ knitr::opts_chunk$set(echo = F,
                       message = F,
                       out.width = 750,
                       fig.align = "center")
+
 library(xaringanthemer)
+
 style_mono_accent(
   base_color = "#1c5253",
   header_font_google = google_font("Josefin Sans"),
@@ -37,14 +37,32 @@ style_mono_accent(
 )
 ```
 
-# Outlne
+# Outline
 
 ---
-
 # Background
+
 
 ---
 # Aggregate effort displacement
+## Expansion of Papahanaomokuakea
+
+.footnote[Lynham et al., 2020]
+
+```{r, out.width = 400}
+knitr::include_graphics("img/monuments.png")
+```
+
+---
+# Aggregate effort displacement
+## Phoenix Island Protected Area
+
+.footnote[Villaseñor-Derbez et al., 2020]
+
+```{r, out.width = 500}
+knitr::include_graphics("img/pna.png") 
+```
+
 
 ---
 # Revillagigedo (*Revilla*) - Old polygon
@@ -61,7 +79,82 @@ knitr::include_graphics("../../results/img/map_new_revilla.png")
 ```
 
 ---
+# Tuna purse seining
+
+```{r}
+knitr::include_graphics("../../results/img/total_hours_before_map.png") 
+```
+
+---
+# Scoring
+
+```{r}
+knitr::include_graphics("../../results/img/most_unclassified_before.png") 
+```
+
+
+---
+# Scoring
+
+```{r}
+knitr::include_graphics("../../results/img/most_classified_before.png") 
+```
+
+
+---
+# Historical usage (aggregate)
+
+On average, only 2.3% of fishing effort occurred within the MPA
+
+```{r}
+knitr::include_graphics("../../results/img/annual_pct_inside_outside.png") 
+```
+
+---
+# Historical usage (individual)
+
+```{r}
+knitr::include_graphics("../../results/img/annual_pct_inside_by_vessel.png") 
+```
+
+---
+# Historical usage (individual)
+color by distance
+```{r}
+knitr::include_graphics("../../results/img/annual_pct_inside_by_vessel.png") 
+```
+
+---
+# Is it proximity?
+
+```{r}
+
+```
+
+
+
+---
+# Zoom in to equi-distant species
+
+---
+# Why heterogeneity within the same vessels?
+
+---
+# Nothing special abour Revilla
+
+If you were to draw a polygon anywhere in the ocean, I bet you would observe similat patterns
+
+---
 # What's the question?
+
+## Understanding distributional impacts will be relevant for MSP
+
+## Understanding _why_ processes arise is interesting
+
+## Why do fishers fish where they fish?
 
 ---
 # Some thoughts
+
+Equations, perhaps
+
