@@ -1,1 +1,3 @@
 # dist_MPA
+
+MPAs exclude fishers and reallocate spatial prperty rights (). this proccess is bound to have an effect on fishing behavior. The announcement of an MPA can trigger preemptive overfishing (Mcdermott), accumulation of biomass within the MPA can lead to "fishing the line" (Murawaski et al), and the potential for fines may cause fishers to avoid MPA borders if they are afraid their gear might accidentlay drift into the protected areas (Cabral et al). Many have looked at how MPAs displace fishing effort, with greatly ideosyncratic effects (Vilalseñor-Derbez, Lynham, White, Lynham again). But we still don't understand _why_ these differences exist. Here, we study the processes by which MPAs can have uneven distributional impacts when fishing effort id displaced.
