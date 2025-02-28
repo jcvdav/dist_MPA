@@ -8,6 +8,8 @@
 
 
 library(rnaturalearth)
+library(sf)
+library(here)
 library(tidyverse)
 
 # Spatial

@@ -9,7 +9,7 @@
 ## Set up #############################################################################################################################################################################
 # Load packages
 library(here)
-library(connections)
+library(DBI)
 library(bigrquery)
 library(tidyverse)
 
@@ -24,27 +24,27 @@ ports <- c("ENSENADA",
            "SAN CARLOS")
 
 # Authenticate using local token 
-bq_auth("juancarlos@ucsb.edu")
+bq_auth("juancarlos.villader@gmail.com")
 
 # Establish a connection to BigQuery
-mex_fisheries <- connection_open(
+mex_fisheries <- dbConnect(
   bigquery(),
-  project = "emlab-gcp",
-  dataset = "mex_fisheries",
-  billing = "emlab-gcp",
+  project = "mex-fisheries",
+  dataset = "mex_vms",
+  billing = "mex-fisheries",
   use_legacy_sql = FALSE,
   allowLargeResults = TRUE
 )
 
-vessel_info <- tbl(mex_fisheries, "vessel_info") %>% 
+vessel_info <- tbl(mex_fisheries, "vessel_info_v_20230803") %>% 
   filter(tuna == 1,
          home_port %in% ports,
          str_detect(gear_type, "CERCO")) %>% 
   select(eu_rnpa, vessel_rnpa, owner_rnpa, hull_identifier, tuna, sardine, shrimp, home_port, contains("num"), engine_power_hp)
 
 
-tracks <- tbl(mex_fisheries, "mex_vms") %>% 
-  select(name, vessel_rnpa, year, month, datetime, lon, lat, speed, course) %>%
+tracks <- tbl(mex_fisheries, "mex_vms_processed_v_20240615") %>% 
+  select(name, vessel_rnpa, year, month, datetime, lon, lat, implied_speed_knots, course, distance_to_last_m, hours) %>%
   inner_join(vessel_info, by = "vessel_rnpa")
 
 local_tracks <- tracks %>% 

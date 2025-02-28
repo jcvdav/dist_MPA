@@ -12,7 +12,7 @@ ports <- st_read(here("data", "processed_data", "ports.gpkg"))
 new_revilla <- st_read(here("data", "processed_data", "revilla_new.gpkg"))
 
 dist_to_mpa <- ports %>% 
-  mutate(distance = st_distance(geom, new_revilla, by_element = T)) %>% 
+  mutate(distance = st_distance(geom, new_revilla)) %>% 
   st_drop_geometry() %>% 
   units::drop_units()
 
