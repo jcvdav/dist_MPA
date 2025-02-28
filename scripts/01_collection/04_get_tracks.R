@@ -6,7 +6,7 @@
 #
 ######################################################
 
-## Set up #############################################################################################################################################################################
+## Set up ######################################################################
 # Load packages
 library(here)
 library(DBI)
@@ -28,7 +28,7 @@ bq_auth("juancarlos.villader@gmail.com")
 
 # Establish a connection to BigQuery
 mex_fisheries <- dbConnect(
-  bigquery(),
+  drv = bigquery(),
   project = "mex-fisheries",
   dataset = "mex_vms",
   billing = "mex-fisheries",

@@ -39,7 +39,20 @@ dist_and_usage <- ggplot(data = disp) +
   labs(x = "Distance from home-port to MPA border (km)",
        y = "Percent of total effort within MPA") +
   theme_bw() +
-  theme(legend.position = "None")
+  theme(legend.position = "bottom")
+
+ggplot(data = disp,
+       mapping = aes(x = distance / 1e3, y = pct, fill = eu_rnpa)) +
+  geom_jitter(height = 0, width = 20,
+              shape = 21, color = "black") +
+  geom_point(pch = ".") +
+  geom_smooth(mapping = aes(x = distance / 1e3, y = pct),
+              formula = y ~  I(x ^ -1), color = "red", method = "lm", inherit.aes = F) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = "Distance from home-port to MPA border (km)",
+       y = "Percent of total effort within MPA") +
+  theme_bw() +
+  theme(legend.position = "bottom")
 
 
 ggsave(plot = dist_and_usage,
@@ -64,7 +77,6 @@ vessel_info <- scored %>%
 kernell <- ggplot(data = closest,
        mapping = aes(x = pct, y = id, fill = eu_rnpa)) +
   geom_density_ridges(bandwidth = 0.009, alpha = 0.5) +
-  geom_vline(xintercept = 0.023, linetype = "dashed") +
   coord_flip() +
   scale_x_continuous(labels = scales::percent) +
   theme_bw() +

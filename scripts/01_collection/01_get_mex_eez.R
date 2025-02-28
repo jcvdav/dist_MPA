@@ -8,14 +8,14 @@
 
 library(here)
 library(sf)
-library(mregions)
+library(mregions2)
 library(tidyverse)
 
-eez <- mr_shp(key = "MarineRegions:eez_iho_union_v2", read = TRUE, maxFeatures = 2e3) %>% 
-  st_as_sf() %>% 
-  filter(country == "Mexico") %>% 
-  group_by(country) %>% 
-  summarize(a = 1) %>% 
-  dplyr::select(-a)
+eez <- gaz_geometry(x = 8429, format = "sf") |> 
+  st_make_valid() |> 
+  st_simplify(preserveTopology = T, dTolerance = 500) |> 
+  st_make_valid()
 
-st_write(eez, dsn = here("data", "processed_data", "mex_ees.gpkg"))
+st_write(obj = eez,
+         dsn = here("data", "processed_data", "mex_eez.gpkg"),
+         delete_dsn = T)

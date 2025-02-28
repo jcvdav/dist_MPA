@@ -8,34 +8,18 @@
 
 library(here)
 library(sf)
-library(mregions)
 library(tidyverse)
 
-mpa <- st_read(dsn = "/Volumes/GoogleDrive/Shared drives/emlab/data/mpa-atlas/mpatlas_20201223_clean",
-               layer = "mpatlas_20201223_clean")
+# WDPAID is 902308
+revilla_old <- st_read(dsn = here("data", "raw_data", "revilla_old", "WDPA_WDOECM_Feb2025_Public_902308_shp_0"),
+               layer = "WDPA_WDOECM_Feb2025_Public_902308_shp-polygons")
   
-
-revilla_old <- mpa %>% 
-  filter(mpa_id == 5344) %>% 
-  group_by(name) %>% 
-  summarize(a = 1) %>% 
-  select(-a)
-
 # New polygon
 # Coordinates com from the DOF decree at:
 # http://www.dof.gob.mx/nota_detalle.php?codigo=5505736&fecha=27/11/2017
-revilla_p <- tibble(x = c(-115.471415, -115.471415, -110.078093, -110.078093, -115.471415),
-                    y = c(17.655231, 20.008631, 20.008631, 17.655231, 17.655231)) %>% 
-  as.matrix() %>% 
-  list() %>% 
-  st_polygon() %>%
-  st_sfc()
-
-revilla_new <- tibble(name = "Revillagigedo") %>% 
-  mutate(geom = revilla_p) %>% 
-  st_as_sf(crs = 4326)
-
-
+# WDPAID is 555629385
+revilla_new <- st_read(dsn = here("data", "raw_data", "revilla_new", "WDPA_WDOECM_Feb2025_Public_555629385_shp_0"),
+                       layer = "WDPA_WDOECM_Feb2025_Public_555629385_shp-polygons")
 
 
 # Export

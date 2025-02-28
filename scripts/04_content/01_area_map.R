@@ -14,7 +14,7 @@ library(tidyverse)
 
 # Spatial
 mex <- ne_countries(country = "Mexico", returnclass = "sf", scale = "medium")
-mex_eez <- st_read(here("data", "processed_data", "mex_ees.gpkg"))
+mex_eez <- st_read(here("data", "processed_data", "mex_eez.gpkg"))
 old_revilla <- st_read(dsn =  here("data", "processed_data", "revilla_old.gpkg"))
 new_revilla <- st_read(dsn = here("data", "processed_data", "revilla_new.gpkg"))
 ports <- st_read(dsn = here("data", "processed_data", "ports.gpkg"))

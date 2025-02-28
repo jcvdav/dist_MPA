@@ -59,7 +59,13 @@ ggsave(plot = total_hours_before,
 
 ## ZOOMED IN MAP OF EFFORT FISHING/NOT FISHING _________________________________
 
-most <- "00000778"
+most <- filter(before, kmeans_fishing, inside) |>
+  group_by(vessel_rnpa) |>
+  summarize(h = sum(hours),
+            .groups = "drop") |>
+  arrange(desc(h)) |>
+  head(1) |> 
+  pull(vessel_rnpa)
 # never <- "00041632"
 
 most_before_zoom <- before %>% 
@@ -73,7 +79,7 @@ unclassified <- ggplot() +
              size =  0.2, color = "steelblue") +
   geom_sf(data = new_revilla, fill = "transparent", color = "red", size = 0.3) +
   theme_void() +
-  labs(title = "All pre-expansion activity by `Madeira`")
+  labs(title = "All pre-expansion activity by `MARIA ANTONIETA`")
 
 classified <- ggplot() +
   geom_point(data = most_before_zoom,
@@ -83,7 +89,7 @@ classified <- ggplot() +
   geom_sf(data = new_revilla, fill = "transparent", color = "red", size = 0.3) +
   theme_void() +
   theme(legend.position = "None") +
-  labs(title = "Scored pre-expansion activity by `Madeira`")
+  labs(title = "Scored pre-expansion activity by `MARIA ANTONIETA`")
 
 ggsave(plot = unclassified,
        filename = here("docs", "img", "most_unclassified_before.png"),
