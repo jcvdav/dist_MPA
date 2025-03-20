@@ -43,11 +43,11 @@ mex <- rnaturalearth::ne_countries(country = "Mexico", returnclass = "sf")
 filter(scored, vessel_rnpa == "00041632") %>% 
   arrange(datetime) %>% 
   mutate(dist = dist_from_last(lon, lat),
-         time = datetime - c(NA, lag(datetime)),) %>% 
-  select(lon, lat, datetime, dist, speed, time) %>% 
+         time = datetime - lag(datetime)) %>% 
+  select(lon, lat, datetime, dist, implied_speed_knots, time) %>% 
   ggplot() +
   geom_sf(data = mex) +
-  geom_path(aes(x = lon, y = lat, color = speed),
+  geom_path(aes(x = lon, y = lat, color = implied_speed_knots),
             arrow = arrow(length = unit(x = 1, units = "mm")))
 
   
@@ -63,20 +63,19 @@ test <- filter(scored, vessel_rnpa %in% c("00041632")) %>%
          leq24h = ifelse(is.na(leq24h), T, leq24h),
          seg_id = paste(vessel_rnpa, cumsum(leq24h), sep = "_")) %>% 
   ungroup() %>% 
-  select(vessel_rnpa, lon, lat, datetime, dist, speed, time, leq24h, seg_id)
+  select(vessel_rnpa, lon, lat, datetime, dist, implied_speed_knots, time, leq24h, seg_id)
 
 seg_info <- test %>% 
   group_by(vessel_rnpa, seg_id) %>% 
   summarize(n_pos = n(),
-            n_pos_mov = sum(speed > 0),
+            n_pos_mov = sum(implied_speed_knots > 0),
             good_segment = n_pos_mov > 24 * 7,
             seg_start = min(datetime),
             seg_end = max(datetime))
 
 
-ggplot(data = test %>% 
-         filter(seg_id %in% c("00041632_4", "00043422_8"))) +
+ggplot(data = test) +
   geom_sf(data = mex) +
-  geom_path(aes(x = lon, y = lat, color = datetime),
+  geom_path(aes(x = lon, y = lat, color = seg_id, group = seg_id),
             arrow = arrow(length = unit(x = 1, units = "mm"))) +
-  facet_wrap(~seg_id)
+  theme(legend.position = "None")
