@@ -20,6 +20,7 @@ revilla_bbox <- st_bbox(new_revilla)
 mex_high <- ne_countries(country = "Mexico", returnclass = "sf", scale = "large") |> 
   st_crop(revilla_bbox)
 
+
 before <- scored %>% 
   filter(lat < 90) %>% 
   filter(before)
@@ -56,7 +57,7 @@ total_hours_before <- ggplot() +
 
 # Export figure
 ggsave(plot = total_hours_before,
-       filename = here("docs", "img", "total_hours_before_map.png"),
+       filename = here("results", "img", "total_hours_before_map.png"),
        width = 6,
        height = 3)
 
@@ -198,6 +199,19 @@ ggplot() +
   theme_void() +
   theme(legend.position = "None")
 
+fishing_after <- after %>% 
+  filter(k2means_fishing)
+
+
+ggplot() +
+  geom_hex(data = fishing_after,
+           mapping = aes(x = lon, y = lat), binwidth = 0.5, color = "transparent") +#,
+  # pch = ".",
+  # color = "black") +
+  geom_sf(data = new_revilla, fill = "transparent", color = "red", size = 0.3) +
+  scale_fill_continuous(trans = "log10") +
+  theme_void() +
+  theme(legend.position = "None")
 
 
 
