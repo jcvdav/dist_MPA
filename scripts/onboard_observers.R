@@ -28,8 +28,11 @@ latlon <- read_delim("/Users/juancarlosvillasenorderbez/Documents/Proyectos/Atú
                      col_names = c("lat", "lon", "Capt"))
 
 coast <- rnaturalearth::ne_countries(country = "Mexico", returnclass = "sf")
+revilla <- st_read(here("data/processed_data/revilla_new.gpkg"))
 
-bd <- read_excel("data/raw_data/BD_ATÚN_2013_JCVD150220.xlsx") %>% 
+scored <- readRDS(file = here("data", "processed_data", "scored_tracks.rds"))
+
+bd <- read_excel("data/raw/BD_ATÚN_2013_JCVD150220.xlsx") %>% 
   janitor::clean_names() %>% 
   rename(longitud = longitud_10,
          talla = longitud_13) %>% 
@@ -44,20 +47,36 @@ tracks_2013 <- scored %>%
          speed_fishing) %>% 
   filter(between(lat, 0, 90))
 
+m <- 8
+
 ggplot() +
   geom_sf(data = coast) +
-  geom_point(data = tracks_2013,
-             mapping = aes(x = lon, y = lat), size = 0.1) +
-  geom_point(data = bd, 
+  geom_point(data = bd |> filter(mes == m), 
              mapping = aes(x = -longitud, y = latitud, size = captura_total),
-             color = "red",
+             color = "black",
              shape = 21,
-             fill = "transparent") +
-  geom_sf(data = new_revilla, color = "blue", fill = "transparent") +
-  theme_bw()
+             fill = "black") +
+  geom_point(data = tracks_2013 |> filter(month == m),
+             mapping = aes(x = lon, y = lat, color = kmeans_fishing)) +
+  geom_sf(data = revilla, color = "blue", fill = "transparent") +
+  theme_bw() +
+  lims(x = c(-115.5, -110), y = c(17.5, 20))
+
+scored |> 
+  mutate(day = day(datetime)) |> 
+  left_join(bd |> mutate(ano = 2000 + ano), by = join_by("day" == "dia", "month" == "mes", "year" == "ano")) |>
+  drop_na(captura_total) |> 
+  group_by(year, month, day) |> 
+  mutate(n = n_distinct(crucero)) |> 
+  ungroup() |> 
+  filter(n == max(n)) |> 
+  ggplot() +
+  geom_point(aes(x = lon, y = lat, color = kmeans_fishing)) +
+  geom_point(aes(x = -longitud, y = latitud), color = "red", size = 4, shape = 21) +
+  geom_sf(data = revilla, color = "blue", fill = "transparent")
 
 # X ----------------------------------------------------------------------------
-filter(sets, between(event, 9, 12)) %>% 
+
   
 
 

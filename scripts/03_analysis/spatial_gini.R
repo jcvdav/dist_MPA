@@ -23,17 +23,25 @@ tracks <-
 dist_df <-
   readRDS(file = here("data", "processed", "distance_to_MPA.rds"))
 
+revilla <- st_read("data/processed_data/revilla_new.gpkg")
+
 ## PROCESSING ##################################################################
 
 # X ----------------------------------------------------------------------------
+bin <- 0.5
+
+st_remove <- function(a, b) {
+  st_filter(a, st_union(b), .predicate = st_disjoint)
+}
+
 spatial_gini <- tracks %>%
   filter(location == "at_sea",
          fishing == 1,
          # vessel_rnpa %in% (vessel_info %>% filter(displaced == 1) %>% pull(vessel_rnpa)),
          between(year, 2014, 2021),
          lon < -80) %>%
-  mutate(lon = (as.integer(floor(lon / 0.5)) * 0.5) + 0.25,
-         lat = (as.integer(floor(lat / 0.5)) * 0.5) + 0.25) %>%
+  mutate(lon = (as.integer(floor(lon / bin)) * bin) + bin / 2,
+         lat = (as.integer(floor(lat / bin)) * bin) + bin / 2) %>%
   mutate(aft = ifelse(year <= 2017, "Before", "After"),
          aft = fct_reorder(aft, year),
          after = ifelse(year == 2017, 0, after)) %>% 
@@ -47,8 +55,18 @@ spatial_gini <- tracks %>%
             h = sum(h, na.rm = T),
             n = n_distinct(vessel_rnpa)) %>%
   ungroup() %>%
-  left_join(dist_df, by = c("lon", "lat")) %>%
-  mutate(bin = (floor(dist / 500) * 500))
+  st_as_sf(coords = c("lon", "lat"), crs = "EPSG:4326") %>%
+  mutate(dist = st_distance(., revilla),
+         dist = units::set_units(dist, "nautical_miles"),
+         dist = as.numeric(dist)) |> 
+  st_remove(b = revilla) |> 
+  filter(dist <= 200) |> 
+  mutate(near = 1 * (dist <= 100),
+         bin = (floor(dist / 100) * 100)) %>% 
+  bind_cols(st_coordinates(.)) |> 
+  st_drop_geometry() |> 
+  rename(lon = X,
+         lat = Y)
 
 ## VISUALIZE ###################################################################
 
@@ -149,7 +167,7 @@ spatial_gini %>%
 
 ggplot(data = spatial_gini,
        mapping = aes(x = year, y = gini, fill = aft, group = year)) +
-  geom_boxplot() +
+  geom_violin() +
   scale_fill_brewer(palette = "Set2") +
   theme_bw() +
   theme(legend.position = "None") +
@@ -158,10 +176,17 @@ ggplot(data = spatial_gini,
 
 ## ANALYZE #####################################################################
 reg_data <- spatial_gini %>%
-  drop_na()
+  drop_na() |> 
+  mutate(bin = as_factor(bin),
+         bin = fct_reorder(.f = bin, .x = dist, .fun = mean, .desc = T)) |> 
+  group_by(lon, lat) |> 
+  mutate(n = n_distinct(after)) |> 
+  ungroup() |> 
+  filter(n == 2)
+  
 
 reg_data %>%
-  group_by(after, bin) %>%
+  group_by(after, near) %>%
   summarize(gini = mean(gini, na.rm = T)) %>% 
   spread(after, gini) %>%
   mutate(dif = `1` - `0`)
@@ -177,13 +202,8 @@ inset <- ggplot(data = reg_data) +
     fill = "transparent"
   ) +
   geom_sf(data = mex, color = "black", size = 0.1) +
-  scale_fill_viridis_c() +
+  scale_fill_viridis_d() +
   theme_void() +
-  guides(fill = guide_colorsteps(
-    title = "Distance bin",
-    frame.colour = "black",
-    ticks.colour = "black"
-  )) +
   theme(
     legend.position = c(0, 1),
     legend.justification = c(0, 1),
@@ -191,33 +211,15 @@ inset <- ggplot(data = reg_data) +
   )
 
 model <- fixest::feols(
-  gini ~ i(bin) + i(bin, after) -1 | year,
-  data = reg_data#,
-  # cluster = ~ lat + lon,
-  # panel.id = c("bin", "year")
+  gini ~ i(year, near, "2017") | near + year,
+  data = reg_data,
+  cluster = ~ lat + lon,
+  panel.id = c("bin", "year")
 )
 
 summary(model)
 
-model %>%
-  broom::tidy() %>%
-  filter(str_detect(term, "[:digit:]:after")) %>%
-  mutate(
-    term = as.numeric(str_remove_all(term, "[:alpha:]|[:punct:]")),
-    term2 = paste0("(", term, "-", term + 500, "]"),
-    term2 = fct_reorder(term2, term)
-  ) %>%
-  ggplot(aes(
-    x = term2,
-    y = estimate,
-    ymin = estimate - std.error,
-    ymax = estimate + std.error
-  )) +
-  geom_pointrange() +
-  geom_hline(yintercept = 0, linetype = "dashed") +
-  theme_bw() +
-  labs(x = "Distance from MPA boundary (Km)",
-       y = "Change in Gini index")
+ggfixest::ggiplot(model)
 
 
 ## EXPORT ######################################################################

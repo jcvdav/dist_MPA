@@ -38,9 +38,11 @@ mex_fisheries <- dbConnect(
 
 vessel_info <- tbl(mex_fisheries, "vessel_info_v_20230803") %>% 
   filter(tuna == 1,
+         shrimp == 0,
+         sardine == 0,
          home_port %in% ports,
          str_detect(gear_type, "CERCO")) %>% 
-  select(eu_rnpa, vessel_rnpa, owner_rnpa, hull_identifier, tuna, sardine, shrimp, home_port, contains("num"), engine_power_hp)
+  select(eu_rnpa, vessel_rnpa, owner_rnpa, hull_identifier, home_port, contains("num"), engine_power_hp)
 
 
 tracks <- tbl(mex_fisheries, "mex_vms_processed_v_20240615") %>% 

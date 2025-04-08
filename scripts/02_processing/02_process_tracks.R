@@ -25,31 +25,37 @@ pacman::p_load(
 
 # Load data --------------------------------------------------------------------
 tracks <- readRDS(file = here("data", "processed_data", "scored_tracks.rds")) |> 
-  filter(kmeans_fishing)
+  filter(kmeans_fishing & speed_fishing)
 mex <- ne_countries(country = "Mexico")
 revilla <- st_read(here("data/processed_data/revilla_new.gpkg"))
 
 revilla_buffer <- st_buffer(revilla, dist = units::as_units(100, "nautical_miles"))
-
+  
 ## PROCESSING ##################################################################
 
 # Assign treatment groups ------------------------------------------------------
 all_before <- tracks |> 
-  filter(before) |> 
+  filter(before, between(year, 2013, 2017)) |>
   pull(vessel_rnpa) |> 
   unique()
 
 length(all_before)
 
-displaced <- tracks |> 
-  filter(before, inside) |> 
+displaced <- tracks |>
+  filter(before, between(year, 2013, 2017)) |>
+  group_by(vessel_rnpa, inside) |>
+  summarize(h = sum(hours)) |>
+  group_by(vessel_rnpa) |>
+  mutate(hr = h / sum(h)) |>
+  filter(inside,
+         hr > 0.01) |> 
   pull(vessel_rnpa) |> 
   unique()
 
 length(displaced)
 
 not_displaced <- tracks |> 
-  filter(before, !inside) |> 
+  filter(before, between(year, 2013, 2017), !inside) |>
   filter(!(vessel_rnpa %in% displaced)) |> 
   pull(vessel_rnpa) |> 
   unique()
@@ -57,7 +63,67 @@ not_displaced <- tracks |>
 length(not_displaced)
 
 processed_tracks <- tracks |> 
+  filter(between(year, 2013, 2022)) |>
   mutate(displaced = vessel_rnpa %in% displaced)
+
+## STUF BELOW SHOULD BE MOVED TO ITS OWN ANALYSIS SCRIPT AFTER EXPORTING THE PROCESSED TRACKS
+
+# Effort through time
+panel <- processed_tracks %>% 
+  group_by(year, displaced, before, vessel_rnpa) %>% 
+  summarize(h = sum(hours, na.rm = T) / 24,
+            .groups = "drop") %>% 
+  ungroup() |> 
+  mutate(after = !before,
+         event = year - 2018)
+
+ggplot(panel, aes(x = year, y = h)) +
+  stat_summary(geom = "line", fun = mean) +
+  stat_summary(geom = "pointrange", fun.data = mean_se, shape = 21, size = 1, fill = "cadetblue") +
+  geom_vline(xintercept = 2017.5, linetype = "dashed") +
+  theme_bw() +
+  labs(x = "Year",
+       y = "Average fishing effort (days)")
+
+ggplot(panel, aes(x = year, y = h, fill = displaced)) +
+  stat_summary(geom = "line", fun = mean) +
+  stat_summary(geom = "pointrange", fun.data = mean_se, shape = 21, size = 1) +
+  geom_vline(xintercept = 2017.5, linetype = "dashed") +
+  theme_bw() +
+  labs(x = "Year",
+       y = "Average fishing effort (days)")
+
+panel %>% 
+  group_by(year, vessel_rnpa, displaced) %>% 
+  summarize(h = sum(h, na.rm = T),
+            .groups = "drop") %>% 
+  ungroup() |> 
+  group_by(vessel_rnpa) %>%
+  mutate(hr = (h - mean(h)) / sd(h)) %>%
+  ungroup() %>%
+  ggplot(aes(x = year, y = hr, fill = displaced)) +
+  stat_summary(geom = "line", fun = mean) +
+  stat_summary(geom = "pointrange", fun.data = mean_se, shape = 21, size = 1) +
+  geom_vline(xintercept = 2017.5, linetype = "dashed") +
+  theme_bw() +
+  theme(legend.position = "inside",
+        legend.position.inside = c(1, 1),
+        legend.justification.inside = c(1,1),
+        legend.background = element_blank()) +
+  labs(x = "Year",
+       y = "Normalized fishing effort ([h - mu] / sigma)",
+       fill = "Status") +
+  scale_fill_brewer(palette = "Set2")
+
+
+m1 <- fixest::feols(log(h) ~ after * displaced,
+            data = panel,
+            cluster ~ vessel_rnpa)
+
+m2 <- fixest::feols(log(h) ~ i(event, displaced, -1) | vessel_rnpa + year,
+                    data = panel)
+
+iplot(m2)
 
 # Build concave hulls
 A <- processed_tracks |> 
@@ -125,7 +191,7 @@ ggplot() +
 plot(AB, reset = F, max.plot = 1)
 plot(AB_after[,1], add = T, col = "red")
 
-EXPORT ######################################################################
+# EXPORT ######################################################################
 
 # X ----------------------------------------------------------------------------
 # 
@@ -150,7 +216,7 @@ stats <- processed_tracks |>
 
 
 # Vessels within the spillover area
-bef_inside <- processed_tracks |> 
+bef_spill <- processed_tracks |> 
   filter(before) |> 
   st_as_sf(coords = c("lon", "lat"), crs = 4326) |> 
   st_filter(revilla_buffer) |> 

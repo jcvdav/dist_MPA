@@ -22,29 +22,20 @@ library(tidyverse)
 
 # Load data --------------------------------------------------------------------
 tracks <-
-  readRDS(file = here("data", "processed", "clean_tracks.rds")) 
-
-vessel_info <- 
-  readRDS(file = here("data", "processed", "clean_vessel_info.rds"))
+  readRDS(file = here("data", "processed_data", "scored_tracks.rds")) 
 
 
 ## PROCESSING ##################################################################
 
 # Create panel -----------------------------------------------------------------
-first <- tracks %>% 
-  group_by(vessel_rnpa) %>% 
-  summarize(first_year = min(year)) %>% 
-  arrange(first_year)
-
-panel <- tracks %>% 
-  filter(fishing == 1) %>% 
+panel <- processed_tracks %>% 
+  filter(kmeans_fishing == 1) %>% 
   group_by(year, vessel_rnpa) %>% 
   summarize(h = sum(hours, na.rm = T) / 24) %>% 
   ungroup() %>% 
   complete(vessel_rnpa, year, fill = list(h = 0)) %>% 
-  mutate(after = 1 * (year >= 2018)) %>% 
-  inner_join(vessel_info, by = "vessel_rnpa") %>% 
-  filter(year >= first_year)
+  mutate(after = 1 * (year >= 2018)) |> 
+  filter(year < 2024)
 
 ## VISUALIZE ###################################################################
 
@@ -104,7 +95,7 @@ m1 <- feols(h ~ year + after * displaced,
             cluster ~ vessel_rnpa)
 
 m2 <- feols(h ~ after * displaced,
-            data = panel %>% filter(between(year, 2017, 2018)),
+            data = panel %>% filter(between(year - 2017, -5, 5)),
             cluster ~ vessel_rnpa)
 
 modelsummary(list(m1, m2),
