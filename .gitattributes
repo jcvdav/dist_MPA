@@ -1,6 +1,7 @@
-
 data/processed/clean_tracks.rds filter=lfs diff=lfs merge=lfs -text
 data/raw/raw_tracks.rds filter=lfs diff=lfs merge=lfs -text
 data/ filter=lfs diff=lfs merge=lfs -text
 data/processed/preprocessed_tracks.rds filter=lfs diff=lfs merge=lfs -text
 data/processed/scored_tracks.rds filter=lfs diff=lfs merge=lfs -text
+data/raw_data/raw_tracks.rds filter=lfs diff=lfs merge=lfs -text
+data/processed_data/scored_tracks.rds filter=lfs diff=lfs merge=lfs -text
