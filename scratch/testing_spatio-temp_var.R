@@ -5,7 +5,7 @@ library(tidyverse)
 test <- readRDS(here("data", "processed_data", "scored_tracks.rds")) |> 
   filter(sardine == 0,
          kmeans_fishing,
-         year(datetime) == 2019,
+         between(year(datetime), 2001, 2019),
          implied_speed_knots > 1) |> 
   arrange(datetime) |> 
   mutate(decade = round(year(datetime) / 10) * 10,
@@ -18,6 +18,8 @@ test <- readRDS(here("data", "processed_data", "scored_tracks.rds")) |>
   st_transform(crs = "+proj=lcc +lat_0=12 +lon_0=-102 +lat_1=17.5 +lat_2=29.5 +x_0=2500000 +y_0=0")
 
 proc <- function(x, grp){
+  # browser()
+  
   x |> 
     group_by_at(c("name", grp)) |> 
     count() |> 
@@ -26,6 +28,7 @@ proc <- function(x, grp){
     st_concave_hull(0.1) |> 
     st_make_valid() %>% 
     mutate(area = st_area(.),
+           area = as.numeric(units::set_units(area, "km2")),
            x = grp[length(grp)]) |> 
     st_drop_geometry() |> 
     group_by(x, name) |> 
@@ -51,12 +54,22 @@ all <- bind_rows(day, week, month, year, decade) |>
                         x == "week" ~ 7,
                         x == "month" ~ 30,
                         x == "year" ~ 365,
-                        x == "decade" ~ 3650),
-         m = as.numeric(m) / 1e6) 
+                        x == "decade" ~ 3650)) 
 
-ggplot(all, aes(x = xx, y = m)) + 
+ggplot(all, aes(x = xx, y = m)) +
   geom_point() +
+  stat_summary(geom = "pointrange", fun.data = "mean_se") +
   geom_smooth(method = "loess") +
+  scale_x_continuous(trans = "log") +
+  scale_y_continuous(trans = "log")
+
+all |> 
+  group_by(xx) |> 
+  summarize(mean = mean(m),
+            sd = sd(m)) |> 
+  ggplot(aes(x = xx, y = mean)) + 
+  geom_pointrange(aes(ymin = mean - sd, ymax = mean + sd), fatten = 1) + 
+  geom_smooth(method = "lm") +
   scale_x_continuous(trans = "log") +
   scale_y_continuous(trans = "log")
 
@@ -67,7 +80,7 @@ ggplot(all, aes(x = xx, y = m / xx)) +
   scale_y_continuous(trans = "log")
 
 
-# I need to make sure that wehn I group by day.. month... year... it's actually using data within the group. For example, if I groiup by year but the vessel is only active in one month, then the year is not really capturing anything else.
+# I need to make sure that when I group by day.. month... year... it's actually using data within the group. For example, if I group by year but the vessel is only active in one month, then the year is not really capturing anything else.
 # # I also need to add distance_to_last again
 # 
 # Make versions where y axis is hours, distance, and area
