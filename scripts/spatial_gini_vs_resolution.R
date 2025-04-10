@@ -6,7 +6,7 @@ library(tidyverse)
 tracks <- readRDS(file = here("data", "processed", "clean_tracks.rds")) |> 
   filter(location == "at_sea",
          fishing == 1,
-         eez == 8429,
+         # eez == 8429,
          lat > 0,
          year == 2021,
          hours < 2)
@@ -26,7 +26,7 @@ get_gini <- function(bin = 1, data = data) {
               .groups = "drop") %>%
     filter(h > 0) %>%
     ungroup() %>%
-    complete(vessel_rnpa, nesting(year, lon, lat), fill = list(h = 0)) %>%
+    # complete(vessel_rnpa, nesting(year, lon, lat), fill = list(h = 0)) %>%
     group_by(year, lon, lat) %>%
     summarize(gini = gini(h),
               h = sum(h, na.rm = T),
@@ -78,13 +78,17 @@ ggplot(viz_summary, aes(x = bin, y = gini_mean)) +
   lims(y = c(0, NA)) 
 
 
-ggplot(data |> filter(bin == 0.1), aes(x = lon, y = lat, fill = gini)) +
+ggplot(data |> filter(bin == 1, n >= 2), aes(x = lon, y = lat, fill = gini)) +
   geom_tile() +
   facet_wrap(~bin) +
-  coord_equal()
+  coord_equal() +
+  scale_fill_viridis_c(option = "magma") +
+  theme_bw()
 
-# x = bin
-# y = gini == 1 / length(gini)
+# Next steps
+# 1) Build plot with x = bin and y = gini == 1 / length(gini)
+# 2) See why there is a cluster around clipperton, and see whether it was there before Revilla expansion
+# 3) What if I calculate gini for vessels that use a pixel, rather than assuming zeroes for all fleet?
 
 
 
