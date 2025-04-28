@@ -25,7 +25,7 @@ pacman::p_load(
 
 # Load data --------------------------------------------------------------------
 tracks <- readRDS(file = here("data", "processed_data", "scored_tracks.rds")) |> 
-  filter(kmeans_fishing & speed_fishing)
+  filter(kmeans_fishing, speed_fishing)
 mex <- ne_countries(country = "Mexico")
 revilla <- st_read(here("data/processed_data/revilla_new.gpkg"))
 
@@ -63,15 +63,23 @@ not_displaced <- tracks |>
 length(not_displaced)
 
 processed_tracks <- tracks |> 
-  filter(between(year, 2013, 2022)) |>
-  mutate(displaced = vessel_rnpa %in% displaced)
+  filter(between(year, 2013, 2023)) |>
+  mutate(displaced = vessel_rnpa %in% displaced) 
 
 ## STUF BELOW SHOULD BE MOVED TO ITS OWN ANALYSIS SCRIPT AFTER EXPORTING THE PROCESSED TRACKS
 
+effort_in_ring <- processed_tracks %>% 
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) |> 
+  st_filter(revilla_buffer) |> 
+  st_filter(st_union(revilla), .predicate = st_disjoint) %>%
+  bind_cols(st_coordinates(.)) |> 
+  st_drop_geometry() |> 
+  rename(lon = X, lat = Y)
+
 # Effort through time
-panel <- processed_tracks %>% 
+panel <- effort_in_ring |> 
   group_by(year, displaced, before, vessel_rnpa) %>% 
-  summarize(h = sum(hours, na.rm = T) / 24,
+  summarize(h = sum(hours, na.rm = T),
             .groups = "drop") %>% 
   ungroup() |> 
   mutate(after = !before,
@@ -83,15 +91,17 @@ ggplot(panel, aes(x = year, y = h)) +
   geom_vline(xintercept = 2017.5, linetype = "dashed") +
   theme_bw() +
   labs(x = "Year",
-       y = "Average fishing effort (days)")
+       y = "Average fishing effort (hours)")
 
-ggplot(panel, aes(x = year, y = h, fill = displaced)) +
+p1 <- ggplot(panel, aes(x = year, y = h, fill = displaced)) +
   stat_summary(geom = "line", fun = mean) +
   stat_summary(geom = "pointrange", fun.data = mean_se, shape = 21, size = 1) +
   geom_vline(xintercept = 2017.5, linetype = "dashed") +
   theme_bw() +
   labs(x = "Year",
-       y = "Average fishing effort (days)")
+       y = "Average fishing effort (hours)",
+       fill = "Displaced fleet") +
+  scale_fill_brewer(palette = "Set2")
 
 panel %>% 
   group_by(year, vessel_rnpa, displaced) %>% 
@@ -123,7 +133,29 @@ m1 <- fixest::feols(log(h) ~ after * displaced,
 m2 <- fixest::feols(log(h) ~ i(event, displaced, -1) | vessel_rnpa + year,
                     data = panel)
 
-iplot(m2)
+p2 <- ggfixest::ggiplot(m2) +
+  labs(x = "Years to closure",
+       title = "Change in effort within spillover ring")
+
+
+ggplot(data = effort_in_ring |> 
+         mutate(when = ifelse(before, "Before", "After"),
+                when = fct_relevel(when, "Before", "After"),
+                lon = floor(lon / 0.1) * 0.1 + 0.05,
+                lat = floor(lat / 0.1) * 0.1 + 0.05) |> 
+         group_by(when, lat, lon) |> 
+         summarize(h = sum(hours)),
+       mapping = aes(x = lon, y = lat, fill = h)) + 
+  geom_tile() +
+  geom_sf(data = revilla, inherit.aes = F) +
+  scale_fill_viridis_c(trans = "log") +
+  facet_wrap(~when) +
+  theme_bw()
+
+cowplot::plot_grid(p1, p2, ncol = 1)
+
+
+
 
 # Build concave hulls
 A <- processed_tracks |> 
@@ -132,7 +164,7 @@ A <- processed_tracks |>
   mutate(a = 1) |> 
   group_by(a) |> 
   summarize(.groups = "drop") |> 
-  st_concave_hull(0.1) |> 
+  st_concave_hull(0.05) |> 
   st_difference(mex) |> 
   select(a)
 
@@ -142,7 +174,7 @@ B <- processed_tracks |>
   mutate(b = 1) |> 
   group_by(b) |> 
   summarize(.groups = "drop") |> 
-  st_concave_hull(0.1) |> 
+  st_concave_hull(0.05) |> 
   st_difference(mex) |> 
   select(b)
 
@@ -156,7 +188,7 @@ A_after <- processed_tracks |>
   mutate(a = 1) |> 
   group_by(a) |> 
   summarize(.groups = "drop") |> 
-  st_concave_hull(0.1) |> 
+  st_concave_hull(0.05) |> 
   st_difference(mex) |> 
   st_difference(revilla) |> 
   select(a)
@@ -167,13 +199,15 @@ B_after <- processed_tracks |>
   mutate(b = 1) |> 
   group_by(b) |> 
   summarize(.groups = "drop") |> 
-  st_concave_hull(0.1) |> 
+  st_concave_hull(0.05) |> 
   st_difference(mex) |> 
   st_difference(revilla) |> 
   select(b)
 
 AB_after <- st_union(A_after, B_after) |> 
   st_make_valid()
+
+# Do the A-B grounds by year, and then I'll be able to have a mean and SD
 
 ## VISUALIZE ###################################################################
 
@@ -189,8 +223,12 @@ ggplot() +
   geom_sf(data = AB_after, fill = "transparent",  color = "purple")
 
 plot(AB, reset = F, max.plot = 1)
-plot(AB_after[,1], add = T, col = "red")
+plot(AB_after[,1], add = T, col = "transparent", alpha = 0.5)
 
+area_before <- st_area(AB) |> units::set_units(value = "km2")
+area_after <- st_area(AB_after) |> units::set_units(value = "km2")
+
+(area_after - area_before) / area_before
 # EXPORT ######################################################################
 
 # X ----------------------------------------------------------------------------
@@ -234,7 +272,12 @@ after_spill <- processed_tracks |>
   unique()
   
 
-length(bef_inside)
+length(bef_spill)
 length(after_spill)
 
+length(displaced)
+
 sum(bef_spill %in% after_spill)
+sum(after_spill %in% displaced)
+sum(bef_spill %in% displaced)
+sum(!(bef_spill %in% displaced))
