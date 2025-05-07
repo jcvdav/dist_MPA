@@ -45,8 +45,8 @@ vessel_info <- tbl(mex_fisheries, "vessel_info_v_20230803") %>%
   select(eu_rnpa, vessel_rnpa, owner_rnpa, hull_identifier, home_port, contains("num"), engine_power_hp)
 
 
-tracks <- tbl(mex_fisheries, "mex_vms_processed_v_20240615") %>% 
-  select(name, vessel_rnpa, year, month, datetime, lon, lat, implied_speed_knots, course, distance_to_last_m, hours) %>%
+tracks <- tbl(mex_fisheries, "mex_vms_processed_v_20250319") %>% 
+  select(vessel_rnpa, seg_id, point_in_seg, datetime, lon, lat, implied_speed_knots, course, distance_to_last_m, hours) %>%
   inner_join(vessel_info, by = "vessel_rnpa")
 
 local_tracks <- tracks %>% 
@@ -54,4 +54,4 @@ local_tracks <- tracks %>%
 
 # Export
 saveRDS(object = local_tracks,
-        file = here("data", "raw_data", "raw_tracks.rds"))
+        file = here("data", "raw", "raw_tracks.rds"))
