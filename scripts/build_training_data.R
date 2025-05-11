@@ -266,12 +266,10 @@ fixed_obs <- vms_activity_with_onboard_coverage |>
 # Combine them
 final <- bind_rows(single_obs, fixed_obs)
 
-nrow(final) == nrow()
+nrow(final) == nrow(single_obs)
 
 ## EXPORT ######################################################################
 
 # X ----------------------------------------------------------------------------
 saveRDS(object = final,
         file = here("data", "processed", "labeled_tracks.rds"))
-
-
