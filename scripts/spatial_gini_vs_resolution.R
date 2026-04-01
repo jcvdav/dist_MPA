@@ -11,7 +11,7 @@ tracks <- readRDS(file = here("data", "processed", "clean_tracks.rds")) |>
          year == 2021,
          hours < 2)
 
-revilla <- st_read("data/processed_data/revilla_new.gpkg")
+revilla <- st_read("data/processed/revilla_new.gpkg")
 
 ## PROCESSING ##################################################################
 
@@ -55,7 +55,7 @@ general <- tracks |>
             n = n_distinct(vessel_rnpa),
             .groups = "drop")
 
-bins <- c(0.01, 0.05, 0.1, 0.5, 1, 5, 10)
+bins <- c(0.01, 0.05, 0.1, 0.5, 1, 5, 10, 15)
 
 data <- map_dfr(bins, get_gini, data = tracks)
 
@@ -80,6 +80,13 @@ ggplot(viz_summary, aes(x = bin, y = gini_mean)) +
 
 ggplot(data |> filter(bin == 1, n >= 2), aes(x = lon, y = lat, fill = gini)) +
   geom_tile() +
+  facet_wrap(~bin) +
+  coord_equal() +
+  scale_fill_viridis_c(option = "magma") +
+  theme_bw()
+
+ggplot(data, aes(x = lon, y = lat, color = gini, z = gini)) +
+  geom_contour() +
   facet_wrap(~bin) +
   coord_equal() +
   scale_fill_viridis_c(option = "magma") +
