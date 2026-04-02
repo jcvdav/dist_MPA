@@ -16,7 +16,7 @@
 library(here)
 
 # Load data --------------------------------------------------------------------
-vessel_info <- readRDS(file = here("data", "raw_data", "vessel_info.rds"))
+vessel_info <- readRDS(file = here("data", "raw", "vessel_info.rds"))
 
 landings <- readRDS(
   file = file.path(
@@ -44,4 +44,4 @@ tuna_landings <- landings %>%
 
 # X ----------------------------------------------------------------------------
 saveRDS(object = tuna_landings,
-        file = here("data", "processed_data", "tuna_landings.rds"))
+        file = here("data", "processed", "tuna_landings.rds"))

@@ -28,5 +28,5 @@ eez <- gaz_geometry(x = 8429, format = "sf") |>
 
 # Export geopackage ------------------------------------------------------------
 st_write(obj = eez,
-         dsn = here("data", "processed_data", "mex_eez.gpkg"),
+         dsn = here("data", "processed", "mex_eez.gpkg"),
          delete_dsn = T)
