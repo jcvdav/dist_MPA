@@ -37,3 +37,15 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+.positai
+
+# AI agent workspaces
+.claude/
+
+# Misc artifacts
+Rplots.pdf
+
+# Rendered reports
+report.html
+report.pdf
+report_files/
