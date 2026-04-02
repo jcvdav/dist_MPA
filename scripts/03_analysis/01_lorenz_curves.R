@@ -1,13 +1,18 @@
 ######################################################
 #title#
 ######################################################
-# 
+#
 # Lorenz curves
 #
 ######################################################
 
+library(here)
+library(tidyverse)
+library(cowplot)
+library(scales)
+source(here(".Rprofile"))
 
-tracks <- readRDS(here("data", "processed", "clean_tracks.rds")) %>% 
+tracks <- readRDS(here("data", "processed", "scored_tracks.rds")) %>%
   filter(year < 2022)
 landings <- readRDS(here("data", "processed", "tuna_landings.rds")) %>% 
   select(-ba)
@@ -108,5 +113,16 @@ gini_plot <- processed %>%
         legend.justification = c(0, 1),
         legend.background = element_blank()) 
 
-cowplot::plot_grid(plot_grid(activity, fishing_hours, landed_plot, ncol = 3),
-                   gini_plot, ncol = 1)
+lorenz_combined <- cowplot::plot_grid(
+  plot_grid(activity, fishing_hours, landed_plot, ncol = 3),
+  gini_plot, ncol = 1
+)
+
+lorenz_combined
+
+## EXPORT ######################################################################
+
+ggsave(here("results", "figures", "lorenz_curves.png"), lorenz_combined,
+       width = 10, height = 8, dpi = 300)
+ggsave(here("results", "figures", "gini_boxplot.png"), gini_plot,
+       width = 5, height = 4, dpi = 300)
